@@ -1,0 +1,6 @@
+<div class="message-thread p-4 h-[calc(100vh-200px)] overflow-y-auto">
+  <div *ngIf="!selectedChatId" class="flex items-center justify-center h-full">
+    Select a chat to start messaging
+  </div>
+  <app-message *ngFor="let message of messages" [message]="message"></app-message>
+</div>

@@ -1,0 +1,12 @@
+<!-- src/app/message/message.component.html -->
+<div class="chat" [ngClass]="{'chat-end': message.isMine, 'chat-start': !message.isMine}">
+  <div class="chat-header">
+    {{ message.sender }}
+  </div>
+  <div class="chat-bubble" [ngClass]="{'chat-bubble-primary': message.isMine, 'chat-bubble-secondary': !message.isMine}">
+    <p>{{ message.content }}</p>
+    <time class="text-xs opacity-50">
+      {{ formatTimestamp(message.timestamp) }}
+    </time>
+  </div>
+</div>

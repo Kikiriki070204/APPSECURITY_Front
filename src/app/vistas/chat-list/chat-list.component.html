@@ -1,0 +1,26 @@
+<div class="bg-base-200 w-80 h-screen p-4">
+  <h2 class="text-2xl font-bold mb-4">Chats</h2>
+  <ul class="menu bg-base-100 w-full rounded-box">
+    <li *ngFor="let chat of chats">
+      <a
+        class="flex items-center p-3 hover:bg-base-200 transition-colors duration-200"
+        [class.bg-base-300]="selectedChatId === chat.id"
+        (click)="selectChat(chat.id)"
+      >
+        <div class="avatar online mr-4">
+          <div class="w-12 rounded-full">
+            <img [src]="chat.avatar" [alt]="chat.name">
+          </div>
+        </div>
+        <div class="flex-1">
+          <div class="flex justify-between items-baseline">
+            <h3 class="font-semibold">{{ chat.name }}</h3>
+            <span class="text-xs text-base-content/70">{{ chat.timestamp }}</span>
+          </div>
+          <p class="text-sm text-base-content/70 truncate">{{ chat.lastMessage }}</p>
+        </div>
+        <div *ngIf="chat.unread > 0" class="badge badge-primary badge-sm">{{ chat.unread }}</div>
+      </a>
+    </li>
+  </ul>
+</div>
