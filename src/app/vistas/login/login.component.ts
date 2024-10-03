@@ -1,7 +1,7 @@
 import { NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Login, User } from '../../interfaces/user';
 import { UserService } from '../../services/user.service';
 
@@ -17,7 +17,7 @@ export class LoginComponent {
   email = new FormControl('', Validators.required)
   password = new FormControl('', Validators.required)
 
-  constructor(protected service: UserService){}
+  constructor(protected service: UserService, protected router: Router){}
 
   login(){
     let self = this
@@ -30,6 +30,7 @@ export class LoginComponent {
           next(value: User) {
             // llevarlo a su dashboard.
             localStorage.setItem('access_token', value.access_token)
+            self.router.navigate(['/chats'])
           },
           error(err) {
             console.log(err)
