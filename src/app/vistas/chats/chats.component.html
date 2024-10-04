@@ -1,67 +1,61 @@
-<!--
-<div class="bg-base-200 w-80 h-screen p-4">
-  <h2 class="text-2xl font-bold mb-4">Usuarios activos</h2>
-  <div class="tabs">
-    <ul class="tab-list">
-      <li *ngFor="let usuario of usuarios" (click)="selectedUserChat(usuario)">
-        <a class="tab">
-          <div class="flex items-center">
-            <div class="avatar online mr-4">
-              <div class="w-12 rounded-full">
-                <img src="https://static.vecteezy.com/system/resources/previews/002/454/635/original/user-social-media-profile-icon-free-vector.jpg" class="w-10 h-10 rounded-full">
-              </div>
-            </div>
-            <div class="flex-1">
-              <h3 class="font-semibold">{{ usuario.name }}</h3>
+<div class="drawer lg:drawer-open">
+  <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+  <div class="drawer-content flex flex-col">
+    <!-- Contenido de la página -->
+    <div class="navbar bg-base-100 lg:hidden">
+      <div class="flex-none">
+        <label for="my-drawer-2" class="btn btn-square btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-5 h-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </label>
+      </div>
+      <div class="flex-1">
+        <a class="btn btn-ghost normal-case text-xl">Chat App</a>
+      </div>
+    </div>
+
+    <!-- Área principal de chat -->
+    <main class="flex-1 bg-base-200 p-4">
+      @if (selectedUser) {
+        <app-user-chat [usuario]="selectedUser"></app-user-chat>
+      } @else {
+        <div class="hero min-h-screen bg-base-200">
+          <div class="hero-content text-center">
+            <div class="max-w-md">
+              <h1 class="text-5xl font-bold">¡Hola!</h1>
+              <p class="py-6">Selecciona un usuario para comenzar una conversación.</p>
             </div>
           </div>
-        </a>
-      </li>
-    </ul>
+        </div>
+      }
+    </main>
   </div>
-</div>
--->
-<div class="flex h-screen">
-  <div class="bg-base-200 w-20 flex-shrink-0">
-   <button>logout</button>
-  </div>
-
-  <div class="bg-white w-80 h-screen p-4 flex-shrink-0">
-    <h2 class="text-2xl font-bold mb-4">Usuarios activos</h2>
-
-    <div *ngFor="let usuario of usuarios" class="hover:bg-base-200 rounded p-2">
-      <ul>
-        <li (click)="selectedUserChat(usuario)" class="mb-2">
-          <button>
-            <div class="flex items-center">
-              <div class="avatar online mr-4">
+  <div class="drawer-side">
+    <label for="my-drawer-2" class="drawer-overlay"></label>
+    <aside class="menu p-4 w-80 min-h-full bg-base-100 text-base-content">
+      <!-- Sidebar content here -->
+      <div class="flex flex-col h-full">
+        <h2 class="text-2xl font-bold mb-4">Usuarios activos</h2>
+        <ul class="menu bg-base-100 w-full rounded-box flex-grow">
+          <li *ngFor="let usuario of usuarios">
+            <a (click)="selectedUserChat(usuario)" [class.active]="selectedUser === usuario">
+              <div class="avatar online">
                 <div class="w-12 rounded-full">
-                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" class="w-10 h-10 rounded-full">
+                  <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"[alt]="usuario.name">
                 </div>
               </div>
-              <div class="flex-1">
-                <h3 class="font-semibold text-lg">{{ usuario.name }}</h3>
-              </div>
-            </div>
+              {{ usuario.name }}
+            </a>
+          </li>
+        </ul>
+        <div class="mt-auto">
+          <button class="btn btn-outline btn-block">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Cerrar sesión
           </button>
-        </li>
-      </ul>
-    </div>
+        </div>
+      </div>
+    </aside>
   </div>
-
-  <div class="flex-1">
- @if(selectedUser == null)
-  {
-    <div class="items-center w-full bg-base-300 h-screen">
-    <h3 class="items-center">¡Empieza una conversación!</h3>
-    </div>
-  }
-  @else {
-    <app-user-chat [usuario]="selectedUser" class="w-full"></app-user-chat>
-  }
-
-  </div>
- 
 </div>
-
-
