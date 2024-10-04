@@ -9,6 +9,6 @@ export interface Mensaje {
 export interface SentMessage {
     sender_id: number
     recipient_id: number
-    content: Text
+    content: string
 }
 

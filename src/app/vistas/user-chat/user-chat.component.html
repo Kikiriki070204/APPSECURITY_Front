@@ -19,18 +19,20 @@
       </div>
     </div>
 
+    <!--mensajes-->
     <div class="flex-1 p-4 overflow-y-auto bg-base-200">
-      <div >
-        <div >
-        
-        </div>
-      </div>
+      <ng-container *ngIf="messages.length > 0; else noMessages">
+        <app-message *ngFor="let msg of messages" [sender]="msg.sender" [recipient]="msg.recipient" [content]="msg.content"></app-message>
+      </ng-container>
+      <ng-template #noMessages>
+        <h2>No hay mensajes</h2>
+      </ng-template>
     </div>
 
     <div class="p-4 bg-base-300">
       <div class="flex">
-        <input type="text" placeholder="Escribe un mensaje..." class="input input-bordered flex-1 mr-2">
-        <button class="btn btn-primary">Enviar</button>
+        <input [formControl]="message" type="text" placeholder="Escribe un mensaje..." class="input input-bordered flex-1 mr-2">
+        <button (click)="sendMessage()" class="btn btn-primary">Enviar</button>
       </div>
     </div>
 </div>
