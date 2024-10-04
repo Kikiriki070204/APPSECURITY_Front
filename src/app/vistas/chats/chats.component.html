@@ -28,9 +28,10 @@
 
   <div class="bg-white w-80 h-screen p-4 flex-shrink-0">
     <h2 class="text-2xl font-bold mb-4">Usuarios activos</h2>
-    <div *ngFor="let usuario of usuarios" >
+
+    <div *ngFor="let usuario of usuarios" class="hover:bg-base-200 rounded p-2">
       <ul>
-        <li (click)="selectedUserChat(usuario)" class="mb-4">
+        <li (click)="selectedUserChat(usuario)" class="mb-2">
           <button>
             <div class="flex items-center">
               <div class="avatar online mr-4">
@@ -51,8 +52,8 @@
   <div class="flex-1">
  @if(selectedUser == null)
   {
-    <div>
-    ¡Empieza una conversación!
+    <div class="items-center w-full bg-base-300 h-screen">
+    <h3 class="items-center">¡Empieza una conversación!</h3>
     </div>
   }
   @else {
