@@ -26,7 +26,10 @@ export class UserChatComponent {
   sendMessage(){
     let self = this
     let mensaje: SentMessage = {
-      sender_id: 1,
+      sender_id: 1, //john, este 1 es debido a que aun no existe una ruta me, cuando exista esa ruta me, debemos
+      //crear un método (puede ser dentro del auth.service.ts) que guarde como cookie el id del usuario, este metodo 
+      //debemos implementarlo en el momento del login <}:=0), aqui unicamente lo mandas a llamar y guardas
+      //en alguna variable este valor :=D
       recipient_id: this.usuario.id,
       content: this.message.value ?? ''
     }
