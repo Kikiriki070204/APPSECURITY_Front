@@ -22,9 +22,14 @@ export class SocketService {
         observer.next(data);
       });
 
+      // Handle cleanup
       return () => {
         this.socket.off(event);
       };
     });
+  }
+
+  joinRoom(userId: string) {
+    this.emit('join', { userId });
   }
 }
