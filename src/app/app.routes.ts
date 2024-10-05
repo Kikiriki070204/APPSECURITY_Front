@@ -1,11 +1,30 @@
 import { Routes } from '@angular/router';
+import { IndexComponent } from './vistas/index/index.component';
+import { RegisterComponent } from './vistas/register/register.component';
+import { LoginComponent } from './vistas/login/login.component';
+import { ChatsComponent } from './vistas/chats/chats.component';
+import { MessageComponent } from './vistas/message/message.component';
+import { authenticateGuard } from './guards/authenticate.guard';
 
 export const routes: Routes = [
     
-        {path: '', loadComponent:() => import('./vistas/index/index.component').then(m=> m.IndexComponent)},
-        {path: 'register', loadComponent:() => import('./vistas/register/register.component').then(m=> m.RegisterComponent)},
-        {path: 'login', loadComponent:() => import('./vistas/login/login.component').then(m=> m.LoginComponent)},
-        {path: 'chats', loadComponent:() => import('./vistas/chats/chats.component').then(m=> m.ChatsComponent)},
-        {path: 'message', loadComponent:() => import('./vistas/message/message.component').then(m=> m.MessageComponent)},
+        {path: '',
+        component: IndexComponent
+},
+        {path: 'register',
+        component: RegisterComponent
+        },
+        {path: 'login', 
+        component: LoginComponent
+        },
+        {path: 'chats', 
+        component: ChatsComponent,
+        canActivate: [authenticateGuard]
+        },
+        {path: 'message', 
+        component: MessageComponent,
+        canActivate: [authenticateGuard]
+
+        },
 
 ];

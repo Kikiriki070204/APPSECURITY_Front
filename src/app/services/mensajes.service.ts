@@ -14,4 +14,7 @@ export class MensajesService {
   sendMessage(data: SentMessage): Observable<Mensaje>{
     return this.http.post<Mensaje>(`${enviroment.api_url}/messages`, data);
   }
+  getMessages(id: Int16Array): Observable<Mensaje[]>{ 
+    return this.http.get<Mensaje[]>(`${enviroment.api_url}/messages/${id}`);
+  }
 }

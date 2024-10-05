@@ -16,7 +16,7 @@ export class SocketService {
     this.socket.emit(event, data);
   }
 
-  on(event: string): Observable<any> {
+  on(event: string, p0: (rooms: any) => void): Observable<any> {
     return new Observable((observer) => {
       this.socket.on(event, (data) => {
         observer.next(data);
@@ -30,6 +30,18 @@ export class SocketService {
   }
 
   joinRoom(userId: string) {
-    this.emit('join', { userId });
+    this.socket.emit('join', { userId });
   }
+
+  onNewMessage(callback: (data: any) => void) {
+    this.socket.on('new_message', callback);
+  }
+  disconnect() {
+    this.socket.disconnect();
+  }
+
+  checkRooms() {
+    this.socket.emit('check_rooms');
+  }
+  
 }

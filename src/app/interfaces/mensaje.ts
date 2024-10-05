@@ -1,4 +1,5 @@
 export interface Mensaje {
+    sender: any
     id: number
     sender_id: number
     recipient_id: number
