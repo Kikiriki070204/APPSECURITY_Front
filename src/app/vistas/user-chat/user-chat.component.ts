@@ -5,6 +5,9 @@ import { MensajesService } from '../../services/mensajes.service';
 import { Mensaje } from '../../interfaces/mensaje';
 import { MessageComponent } from '../message/message.component';
 import { NgFor, NgIf } from '@angular/common';
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from '../../services/auth.service';
+import { SocketService } from '../../services/socket.service';
 
 @Component({
   selector: 'app-user-chat',
@@ -21,23 +24,29 @@ export class UserChatComponent {
   recipient: any = null
   content: any = null
   message_sent: boolean = false
+  sender_id: any = null
 
-  constructor(protected messageservice: MensajesService){}
+  constructor(protected messageservice: MensajesService, protected cookie: AuthService, protected socket: SocketService){}
   sendMessage(){
     let self = this
+    let current_user = this.cookie.getId()
+    this.sender_id = parseInt(current_user, 10);
     let mensaje: SentMessage = {
-      sender_id: 1, //john, este 1 es debido a que aun no existe una ruta me, cuando exista esa ruta me, debemos
-      //crear un método (puede ser dentro del auth.service.ts) que guarde como cookie el id del usuario, este metodo 
-      //debemos implementarlo en el momento del login <}:=0), aqui unicamente lo mandas a llamar y guardas
-      //en alguna variable este valor :=D
+      sender_id: this.sender_id, //<}):o){| payaso
       recipient_id: this.usuario.id,
       content: this.message.value ?? ''
     }
     this.messageservice.sendMessage(mensaje).subscribe({
       next(value: Mensaje) {
         self.messages.push({
-          sender: 1,
+          sender: self.sender_id,
           recipient: self.usuario.id,
+          content: self.message.value
+        });
+
+        self.socket.emit('new_message', {
+          sender_id: self.sender_id,
+          recipient_id: self.usuario.id,
           content: self.message.value
         });
         self.message.reset();

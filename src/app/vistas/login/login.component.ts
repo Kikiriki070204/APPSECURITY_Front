@@ -4,6 +4,7 @@ import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Router, RouterLink } from '@angular/router';
 import { Login, User } from '../../interfaces/user';
 import { UserService } from '../../services/user.service';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent {
   email = new FormControl('', Validators.required)
   password = new FormControl('', Validators.required)
 
-  constructor(protected service: UserService, protected router: Router){}
+  constructor(protected service: UserService, protected router: Router, protected cookie: CookieService){}
 
   login(){
     let self = this
@@ -30,6 +31,7 @@ export class LoginComponent {
           next(value: User) {
             // llevarlo a su dashboard.
             localStorage.setItem('access_token', value.access_token)
+            self.cookie.set('id',value.id.toString())
             self.router.navigate(['/chats'])
           },
           error(err) {
