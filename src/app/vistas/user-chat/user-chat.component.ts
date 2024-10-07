@@ -1,62 +1,110 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { SentMessage } from '../../interfaces/mensaje';
-import { MensajesService } from '../../services/mensajes.service';
-import { Mensaje } from '../../interfaces/mensaje';
-import { MessageComponent } from '../message/message.component';
 import { NgFor, NgIf } from '@angular/common';
-import { CookieService } from 'ngx-cookie-service';
+import { SentMessage, Mensaje } from '../../interfaces/mensaje';
+import { MensajesService } from '../../services/mensajes.service';
+import { MessageComponent } from '../message/message.component';
 import { AuthService } from '../../services/auth.service';
 import { SocketService } from '../../services/socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-user-chat',
   standalone: true,
   imports: [FormsModule, ReactiveFormsModule, MessageComponent, NgIf, NgFor],
   templateUrl: './user-chat.component.html',
-  styleUrl: './user-chat.component.css'
+  styleUrls: ['./user-chat.component.css']
 })
-export class UserChatComponent {
+export class UserChatComponent implements OnInit, OnDestroy {
   @Input() usuario: any;
-  message = new FormControl('',Validators.required)
-  messages: { sender: any, recipient: any, content: any }[] = [];
-  sender: any = null
-  recipient: any = null
-  content: any = null
-  message_sent: boolean = false
-  sender_id: any = null
+  message = new FormControl('', Validators.required);
+  messages: Mensaje[] = [];
+  senderId: number;
+  private newMessageSubscription: Subscription = new Subscription;
 
-  constructor(protected messageservice: MensajesService, protected cookie: AuthService, protected socket: SocketService){}
-  sendMessage(){
-    let self = this
-    let current_user = this.cookie.getId()
-    this.sender_id = parseInt(current_user, 10);
-    let mensaje: SentMessage = {
-      sender_id: this.sender_id, //<}):o){| payaso
-      recipient_id: this.usuario.id,
-      content: this.message.value ?? ''
-    }
-    this.messageservice.sendMessage(mensaje).subscribe({
-      next(value: Mensaje) {
-        self.messages.push({
-          sender: self.sender_id,
-          recipient: self.usuario.id,
-          content: self.message.value
-        });
-
-        self.socket.emit('new_message', {
-          sender_id: self.sender_id,
-          recipient_id: self.usuario.id,
-          content: self.message.value
-        });
-        self.message.reset();
-      },
-      error(err) {
-        console.log(err);
-      },
-    })
-
+  constructor(
+    private messageService: MensajesService,
+    private authService: AuthService,
+    private socketService: SocketService
+  ) {
+    this.senderId = parseInt(this.authService.getId(), 10);
   }
 
+  ngOnInit() {
+    this.loadMessages();
+    this.joinRoom();
+    this.listenForNewMessages();
+  }
 
+  ngOnDestroy() {
+    this.leaveRoom();
+    if (this.newMessageSubscription) {
+      this.newMessageSubscription.unsubscribe();
+    }
+  }
+
+  private joinRoom() {
+    const roomName = this.getRoomName();
+    this.socketService.joinRoom(this.senderId, roomName);
+  }
+
+  private leaveRoom() {
+    const roomName = this.getRoomName();
+    this.socketService.leaveRoom(this.senderId, roomName);
+  }
+
+  private getRoomName(): string {
+    return `chat_${Math.min(this.senderId, this.usuario.id)}_${Math.max(this.senderId, this.usuario.id)}`;
+  }
+
+  private loadMessages() {
+    this.messageService.getMessages(this.usuario.id).subscribe({
+      next: (messages: Mensaje[]) => {
+        this.messages = messages;
+      },
+      error: (err) => console.error('Error loading messages:', err)
+    });
+  }
+
+  private listenForNewMessages() {
+    this.newMessageSubscription = this.socketService.onNewMessage().subscribe({
+      next: (message: Mensaje) => {
+        if (
+          (message.sender_id === this.senderId && message.recipient_id === this.usuario.id) ||
+          (message.sender_id === this.usuario.id && message.recipient_id === this.senderId)
+        ) {
+          this.messages.push(message);
+        }
+      },
+      error: (err) => console.error('Error receiving new message:', err)
+    });
+  }
+
+       sendMessage() {
+      if (this.message.invalid) return;
+    
+      const newMessage: Mensaje = {
+        sender_id: this.senderId,
+        recipient_id: this.usuario.id,
+        content: new Text(this.message.value ?? ''), // Convert string to Text
+        timestamp: new Date(), // Assigning a Date object instead of a string
+        id: Date.now() // Temporary ID
+      };
+    
+      // Optimistically add the message to the UI
+      this.messages.push(newMessage);
+    
+      // Send message via WebSocket
+      this.socketService.sendMessage(newMessage);
+    
+      // Fallback: Send message via HTTP if WebSocket fails
+      this.messageService.sendMessage(newMessage).subscribe({
+        error: (err) => {
+          console.error('Error sending message via HTTP:', err);
+          // You might want to notify the user or retry
+        }
+      });
+    
+      this.message.reset();
+    }
 }

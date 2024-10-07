@@ -1,14 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
+import { SentMessage } from '../interfaces/mensaje';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SocketService {
+  leaveRoom(senderId: number, roomName: string) {
+    throw new Error('Method not implemented.');
+  }
+  onNewMessage() {
+    throw new Error('Method not implemented.');
+  }
+  sendMessage(newMessage: SentMessage) {
+    throw new Error('Method not implemented.');
+  }
 
-  private socket: Socket 
-  constructor() { 
+  private socket: Socket
+  constructor() {
     this.socket = io('http://localhost:5000');
   }
 
@@ -16,7 +26,7 @@ export class SocketService {
     this.socket.emit(event, data);
   }
 
-  on(event: string): Observable<any> {
+  on(event: string, p0: (message: any) => void): Observable<any> {
     return new Observable((observer) => {
       this.socket.on(event, (data) => {
         observer.next(data);
@@ -29,7 +39,7 @@ export class SocketService {
     });
   }
 
-  joinRoom(userId: string) {
+  joinRoom(senderId: number, userId: string) {
     this.emit('join', { userId });
   }
 }
