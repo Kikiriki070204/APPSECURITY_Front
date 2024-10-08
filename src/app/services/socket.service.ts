@@ -39,7 +39,7 @@ export class SocketService {
     });
   }
 
-  joinRoom(senderId: number, userId: string) {
-    this.emit('join', { userId });
+  joinRoom(userId: string, room: string) {
+    this.emit('join', { userId, room });
   }
 }

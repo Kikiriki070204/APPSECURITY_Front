@@ -22,7 +22,7 @@
     <!--mensajes-->
     <div class="flex-1 p-4 overflow-y-auto bg-base-200">
       <ng-container *ngIf="messages.length > 0; else noMessages">
-        <app-message *ngFor="let msg of messages" [sender]="msg.sender" [recipient]="msg.recipient" [content]="msg.content"></app-message>
+        <app-message *ngFor="let msg of messages" [sender]="msg.sender_id" [recipient]="msg.recipient_id" [content]="msg.content"></app-message>
       </ng-container>
       <ng-template #noMessages>
         <h2>No hay mensajes</h2>

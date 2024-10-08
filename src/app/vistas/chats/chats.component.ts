@@ -51,23 +51,11 @@ export class ChatsComponent implements OnInit {
     console.log("start chatting with:", this.selectedUser.name);
 
     if (this.user_id !== null) {
-      this.socket.joinRoom(this.user_id.toString());
+      this.socket.joinRoom(this.user_id.toString(), 'room');
     } else {
       console.error("User ID is null. Unable to join room.");
       // Handle error (e.g., show a notification to the user or redirect to login)
     }
   }
 
-  logout(): void {
-    this.authService.logout().subscribe(
-      () => {
-        // Clear any local storage or session data if necessary
-        this.router.navigate(['/login']);
-      },
-      error => {
-        console.error("Error during logout:", error);
-        // Handle error (e.g., show a notification to the user)
-      }
-    );
-  }
 }

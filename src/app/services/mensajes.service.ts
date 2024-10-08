@@ -32,7 +32,6 @@ export class MensajesService {
   }
 
   sendMessage(data: SentMessage): Observable<Mensaje> {
-    this.socket.emit('send_message', data);
     return this.http.post<Mensaje>(`${enviroment.api_url}/messages`, data);
   }
 
@@ -45,6 +44,6 @@ export class MensajesService {
   }
 
   getMessages(id: any): Observable<Mensaje[]> {
-    return this.messagesSubject.asObservable();
+    return this.http.get<Mensaje[]>(`${enviroment.api_url}/messages/` + id)
   }
 }

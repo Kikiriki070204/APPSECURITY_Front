@@ -15,10 +15,10 @@ import { Subscription } from 'rxjs';
   templateUrl: './user-chat.component.html',
   styleUrls: ['./user-chat.component.css']
 })
-export class UserChatComponent implements OnInit, OnDestroy {
+export class UserChatComponent implements OnInit {
   @Input() usuario: any;
   message = new FormControl('', Validators.required);
-  messages: Mensaje[] = [];
+  messages: SentMessage[] = [];
   senderId: number;
   private newMessageSubscription: Subscription = new Subscription;
 
@@ -31,80 +31,112 @@ export class UserChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadMessages();
     this.joinRoom();
-    this.listenForNewMessages();
+    this.receivedMessages()
   }
 
-  ngOnDestroy() {
-    this.leaveRoom();
-    if (this.newMessageSubscription) {
-      this.newMessageSubscription.unsubscribe();
-    }
-  }
+  // ngOnDestroy() {
+  //   this.leaveRoom();
+  //   if (this.newMessageSubscription) {
+  //     this.newMessageSubscription.unsubscribe();
+  //   }
+  // }
 
   private joinRoom() {
-    const roomName = this.getRoomName();
-    this.socketService.joinRoom(this.senderId, roomName);
+    this.socketService.joinRoom(this.senderId.toString(), 'room'); //este string de room es temporal debemos hacer uno personalizado
   }
 
-  private leaveRoom() {
-    const roomName = this.getRoomName();
-    this.socketService.leaveRoom(this.senderId, roomName);
+  // private leaveRoom() {
+  //   const roomName = this.getRoomName();
+  //   this.socketService.leaveRoom(this.senderId, roomName);
+  // }
+
+  // private getRoomName(): string {
+  //   return `chat_${Math.min(this.senderId, this.usuario.id)}_${Math.max(this.senderId, this.usuario.id)}`;
+  // }
+
+  // private loadMessages() {
+  //   this.messageService.getMessages(this.usuario.id).subscribe({
+  //     next: (messages: Mensaje[]) => {
+  //       this.messages = messages;
+  //     },
+  //     error: (err) => console.error('Error loading messages:', err)
+  //   });
+  // }
+
+
+  receivedMessages(): void
+  {
+   
+    this.messageService.getMessages(this.senderId)
+    .subscribe(messages => {
+    }); 
   }
 
-  private getRoomName(): string {
-    return `chat_${Math.min(this.senderId, this.usuario.id)}_${Math.max(this.senderId, this.usuario.id)}`;
-  }
+  sendMessage(){
+  let self = this
+   let new_message: SentMessage = {
+    sender_id: this.senderId,
+    recipient_id: this.usuario.id,
+    content: this.message.value ?? ""
+   }
 
-  private loadMessages() {
-    this.messageService.getMessages(this.usuario.id).subscribe({
-      next: (messages: Mensaje[]) => {
-        this.messages = messages;
-      },
-      error: (err) => console.error('Error loading messages:', err)
-    });
-  }
-
-  private listenForNewMessages() {
-    this.newMessageSubscription = this.socketService.onNewMessage().subscribe({
-      next: (message: Mensaje) => {
-        if (
-          (message.sender_id === this.senderId && message.recipient_id === this.usuario.id) ||
-          (message.sender_id === this.usuario.id && message.recipient_id === this.senderId)
-        ) {
-          this.messages.push(message);
-        }
-      },
-      error: (err) => console.error('Error receiving new message:', err)
-    });
-  }
-
-       sendMessage() {
-      if (this.message.invalid) return;
-    
-      const newMessage: Mensaje = {
-        sender_id: this.senderId,
-        recipient_id: this.usuario.id,
-        content: new Text(this.message.value ?? ''), // Convert string to Text
-        timestamp: new Date(), // Assigning a Date object instead of a string
-        id: Date.now() // Temporary ID
-      };
-    
-      // Optimistically add the message to the UI
-      this.messages.push(newMessage);
-    
-      // Send message via WebSocket
-      this.socketService.sendMessage(newMessage);
-    
-      // Fallback: Send message via HTTP if WebSocket fails
-      this.messageService.sendMessage(newMessage).subscribe({
-        error: (err) => {
-          console.error('Error sending message via HTTP:', err);
-          // You might want to notify the user or retry
-        }
+   this.messageService.sendMessage(new_message).subscribe({
+    next(value: Mensaje){
+      self.socketService.emit('send_message', new_message);
+      console.log("mensaje enviado con éxito")
+      self.messages.push({
+        sender_id: self.senderId,
+        recipient_id: self.usuario.id,
+        content: self.message.value ?? ""
       });
+      self.message.reset();
+
+    }, error(err) {
+      console.log(err)
+      console.log("no se envio el mensaje")
+    },
+   })
+  }
+  // private listenForNewMessages() {
+  //   this.newMessageSubscription = this.socketService.onNewMessage().subscribe({
+  //     next: (message: Mensaje) => {
+  //       if (
+  //         (message.sender_id === this.senderId && message.recipient_id === this.usuario.id) ||
+  //         (message.sender_id === this.usuario.id && message.recipient_id === this.senderId)
+  //       ) {
+  //         this.messages.push(message);
+  //       }
+  //     },
+  //     error: (err) => console.error('Error receiving new message:', err)
+  //   });
+  // }
+
+  //      sendMessage() {
+  //     if (this.message.invalid) return;
     
-      this.message.reset();
-    }
+  //     const newMessage: Mensaje = {
+  //       sender_id: this.senderId,
+  //       recipient_id: this.usuario.id,
+  //       content: new Text(this.message.value ?? ''), // Convert string to Text
+  //       timestamp: new Date(), // Assigning a Date object instead of a string
+  //       id: Date.now() // Temporary ID
+  //     };
+    
+  //     // Optimistically add the message to the UI
+  //     this.messages.push(newMessage);
+    
+  //     // Send message via WebSocket
+  //     this.socketService.sendMessage(newMessage);
+    
+  //     // Fallback: Send message via HTTP if WebSocket fails
+  //     this.messageService.sendMessage(newMessage).subscribe({
+  //       error: (err) => {
+  //         console.error('Error sending message via HTTP:', err);
+  //         // You might want to notify the user or retry
+  //       }
+  //     });
+    
+  //     this.message.reset();
+  //   }
 }
