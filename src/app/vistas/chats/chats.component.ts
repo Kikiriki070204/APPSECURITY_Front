@@ -5,12 +5,21 @@ import { MensajesService } from '../../services/mensajes.service';
 import { NgFor, NgIf } from '@angular/common';
 import { UserChatComponent } from '../user-chat/user-chat.component';
 import { SocketService } from '../../services/socket.service';
+import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../services/auth.service';
 import { ChatService } from '../../services/chat.service';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
 @Component({
   selector: 'app-chats',
   standalone: true,
-  imports: [NgFor, NgIf, UserChatComponent],
+  imports: [NgFor, NgIf, 
+    UserChatComponent,
+
+    
+  ],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.css'
 })
@@ -20,10 +29,13 @@ selectedUser: any = null
 user_id: any = null
 messages: any[] = []
 
+
 constructor(protected userService: UserService, 
   protected socket: SocketService, protected cookie: AuthService,
 protected MensajesService: MensajesService,
-protected chatService: ChatService
+protected chatService: ChatService,
+protected cookiee: CookieService,
+private HttpClient: HttpClient
 ){}
 
 ngOnInit(): void {
@@ -58,6 +70,13 @@ selectedUserChat(usuario: User): void {
   });
 
   this.socket.checkRooms();
+}
+logout(): void {
+  this.cookiee.delete('id');
+  localStorage.removeItem('access_token');
+  this.socket.disconnect();
+  window.location.href = '/';
+  console.log("logout")
 }
 
 

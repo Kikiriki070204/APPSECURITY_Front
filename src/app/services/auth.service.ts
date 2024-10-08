@@ -22,4 +22,8 @@ export class AuthService {
   getId(): string{
     return this.cookie.get('id') ?? '';
   }
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    return token != null;
+  }
 }
