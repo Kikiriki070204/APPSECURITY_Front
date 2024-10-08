@@ -40,6 +40,17 @@ export class UserChatComponent {
       if (user) {
         this.selectedUser = user;
         this.loadMessages();
+
+
+        this.socket.onNewMessage((data) => {
+          console.log('Nuevo mensaje recibido:', data);
+          this.messages.push({
+            sender: data.sender_id,
+            recipient: data.recipient_id,
+            content: data.content
+          });
+        });
+        
       }
     });
   }
@@ -51,7 +62,7 @@ export class UserChatComponent {
           console.log("Mensajes cargados:", mensajes);
           this.messages = mensajes.map(mensaje => ({
             sender: mensaje.sender_id,
-            recipient: this.usuario.id,
+            recipient: mensaje.recipient_id,
             content: mensaje.content
           }));
         },
@@ -81,16 +92,16 @@ export class UserChatComponent {
           room_name: roomName
         });
     
-        this.messages.push({
-          sender: this.sender_id,
-          recipient: this.usuario.id,
-          content: this.message.value
-        });
+        // this.messages.push({
+        //   sender: this.sender_id,
+        //   recipient: this.usuario.id,
+        //   content: this.message.value
+        // });
     
         this.message.reset();
       },
       error: (err) => {
-        console.log(err);
+        console.log("error",err);
       },
     })
 

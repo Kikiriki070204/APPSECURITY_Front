@@ -1,11 +1,10 @@
-@if(sender == 1)
-{
+<div *ngIf="sender_id === sender">
   <div class="chat chat-end">
     <div class="chat-bubble">{{content}}</div>
   </div>
-}
-@else {
+</div>
+<div *ngIf="sender_id !== sender">
   <div class="chat chat-start">
-    <div class="chat-bubble">mensaje del otro usuario</div>
+    <div class="chat-bubble">{{content}}</div>
   </div>
-}
+</div>
