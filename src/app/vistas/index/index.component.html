@@ -1,20 +1,28 @@
-<div
-  class="hero min-h-screen bg-base-200">
-  <div class="hero-content text-neutral-content text-center">
-    <div class="max-w-md">
-      <div class="avatar">
-        <div class="w-24">
-          <img src="https://static.thenounproject.com/png/1978204-200.png" />
-        </div>
+<div class="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center p-4">
+  <div class="card w-full max-w-sm bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center">
+      <div class="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
       </div>
-      <h1 class="mb-5 text-5xl font-bold text-black">¡Bienvenido!</h1>
-      <p class="mb-5 text-lg font-bold text-black">
-        Empieza a mensajear de manera segura
-      </p>
-      <div class="flex flex-col space-y-4">
-        <a [routerLink]="['/login']"class="btn bg-black border-black text-white">Iniciar sesión</a>
-        <a [routerLink]="['/register']" class="btn bg-gray-700 text-white">Registrarse</a>
+      <h1 class="text-4xl font-bold mb-2">¡Hola, amigo!</h1>
+      <p class="text-lg mb-6">Chatea de forma segura y diviértete</p>
+      <div class="flex flex-col w-full gap-3">
+        <a [routerLink]="['/login']" class="btn btn-primary btn-lg">
+          Entrar
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </a>
+        <a [routerLink]="['/register']" class="btn btn-outline btn-lg">
+          Crear cuenta
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </a>
       </div>
+
     </div>
   </div>
 </div>

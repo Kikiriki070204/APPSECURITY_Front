@@ -1,5 +1,5 @@
 export const enviroment = {
-    production: true,
+    production: false,
     api_url: 'http://127.0.0.1:5000/api'
 ,
 }
