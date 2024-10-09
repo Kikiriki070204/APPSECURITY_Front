@@ -39,6 +39,7 @@ export class UserChatComponent {
     this.chatService.selectedUser$.subscribe(user => {
       if (user) {
         this.selectedUser = user;
+        this.usuario = this.selectedUser
         this.loadMessages();
 
 
