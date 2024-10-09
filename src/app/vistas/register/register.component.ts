@@ -36,7 +36,7 @@ export class RegisterComponent {
       next(value: User ) {
         // llevarlo a login.
         console.log(value.username)
-        self.router.navigate(['/login'])
+        self.router.navigate(['/verify'])
       },
       error(err) {
         console.log(err)

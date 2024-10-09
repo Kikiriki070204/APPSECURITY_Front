@@ -8,23 +8,23 @@ import { authenticateGuard } from './guards/authenticate.guard';
 
 export const routes: Routes = [
     
-        {path: '',
-        component: IndexComponent
-},
+        {path: '',loadComponent: () => import('./vistas/index/index.component').then(m=>m.IndexComponent)},
         {path: 'register',
-        component: RegisterComponent
+                loadComponent: () => import('./vistas/register/register.component').then(m=>m.RegisterComponent)
+        },
+        {path: 'verify', 
+                loadComponent: () => import('./vistas/verify/verify.component').then(m=>m.VerifyComponent)
         },
         {path: 'login', 
-        component: LoginComponent
+                loadComponent: () => import('./vistas/login/login.component').then(m=>m.LoginComponent)
         },
         {path: 'chats', 
-        component: ChatsComponent,
-        canActivate: [authenticateGuard]
+                loadComponent: () => import('./vistas/chats/chats.component').then(m=>m.ChatsComponent),
+                canActivate: [authenticateGuard]
         },
         {path: 'message', 
-        component: MessageComponent,
-        canActivate: [authenticateGuard]
-
+                loadComponent: () => import('./vistas/message/message.component').then(m=>m.MessageComponent),
+                canActivate: [authenticateGuard]
         },
 
 ];
