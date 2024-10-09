@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { Login, User } from '../../interfaces/user';
 import { UserService } from '../../services/user.service';
 import { CookieService } from 'ngx-cookie-service';
+import { HttpResponse } from '../../interfaces/http';
 
 @Component({
   selector: 'app-login',
@@ -31,6 +32,10 @@ export class LoginComponent {
           email : this.email.value ?? "",
           password: this.password.value ?? ""
         }
+        if (this.email.invalid || this.password.invalid) {
+          this.errorMessage = 'Por favor, completa todos los campos correctamente.';
+          return;
+        }
 
         this.service.login(login).subscribe({
           next(value: User) {
@@ -39,9 +44,12 @@ export class LoginComponent {
             self.cookie.set('id',value.id.toString())
             self.router.navigate(['/chats'])
           },
-          error(err) {
-            console.log(err)
-          },
+          error(err: HttpResponse) {
+            if(err.status == 401)
+            {
+              self.errorMessage = 'Contraseña incorrecta'
+            }
+          }
         })
   }
 

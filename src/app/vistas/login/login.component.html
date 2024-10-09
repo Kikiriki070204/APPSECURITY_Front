@@ -29,6 +29,15 @@
             </button>
           </div>
         </div>
+
+        
+        <div *ngIf="errorMessage">
+          <div class="flex-1 text-error font-semibold">
+          <span>{{errorMessage}}</span>
+          </div>
+         
+        </div>
+
         <div class="form-control mt-6">
           <button (click)="login()" class="btn btn-primary">
             Entrar
@@ -40,7 +49,7 @@
       </form>
       <div class="divider">o</div>
 
-      <p class="text-center mt-6 text-sm">z
+      <p class="text-center mt-6 text-sm">
         ¿No tienes una cuenta? <a [routerLink]="['/register']" class="link link-primary">Regístrate</a>
       </p>
     </div>

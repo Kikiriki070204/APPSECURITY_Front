@@ -1,142 +1,112 @@
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgFor, NgIf } from '@angular/common';
-import { SentMessage, Mensaje } from '../../interfaces/mensaje';
+import { SentMessage } from '../../interfaces/mensaje';
 import { MensajesService } from '../../services/mensajes.service';
+import { Mensaje } from '../../interfaces/mensaje';
 import { MessageComponent } from '../message/message.component';
+import { NgFor, NgIf } from '@angular/common';
+import { CookieService } from 'ngx-cookie-service';
 import { AuthService } from '../../services/auth.service';
+import { Socket } from 'socket.io-client';
 import { SocketService } from '../../services/socket.service';
-import { Subscription } from 'rxjs';
+import { User } from '../../interfaces/user';
+import { ChatService } from '../../services/chat.service';
 
 @Component({
   selector: 'app-user-chat',
   standalone: true,
   imports: [FormsModule, ReactiveFormsModule, MessageComponent, NgIf, NgFor],
   templateUrl: './user-chat.component.html',
-  styleUrls: ['./user-chat.component.css']
+  styleUrl: './user-chat.component.css'
 })
-export class UserChatComponent implements OnInit {
+export class UserChatComponent {
   @Input() usuario: any;
-  message = new FormControl('', Validators.required);
-  messages: SentMessage[] = [];
-  senderId: number;
-  private newMessageSubscription: Subscription = new Subscription;
+  selectedUser: User | null = null;
+  message = new FormControl('',Validators.required)
+  messages: { sender: any, recipient: any, content: any }[] = [];
+  sender: any = null
+  recipient: any = null
+  content: any = null
+  message_sent: boolean = false
+  mensaje: any = null
+  sender_id: any = null
 
-  constructor(
-    private messageService: MensajesService,
-    private authService: AuthService,
-    private socketService: SocketService
-  ) {
-    this.senderId = parseInt(this.authService.getId(), 10);
+  constructor(protected messageservice: MensajesService, 
+    protected cookie: AuthService, protected socket: SocketService,
+    private chatService: ChatService
+  ){}
+  ngOnInit(): void {
+    this.chatService.selectedUser$.subscribe(user => {
+      if (user) {
+        this.selectedUser = user;
+        this.usuario = this.selectedUser
+        this.loadMessages();
+
+
+        this.socket.onNewMessage((data) => {
+          console.log('Nuevo mensaje recibido:', data);
+          this.messages.push({
+            sender: data.sender_id,
+            recipient: data.recipient_id,
+            content: data.content
+          });
+        });
+        
+      }
+    });
   }
 
-  ngOnInit() {
-    this.joinRoom();
-    this.receivedMessages()
-  }
-
-  // ngOnDestroy() {
-  //   this.leaveRoom();
-  //   if (this.newMessageSubscription) {
-  //     this.newMessageSubscription.unsubscribe();
-  //   }
-  // }
-
-  private joinRoom() {
-    this.socketService.joinRoom(this.senderId.toString(), 'room'); //este string de room es temporal debemos hacer uno personalizado
-  }
-
-  // private leaveRoom() {
-  //   const roomName = this.getRoomName();
-  //   this.socketService.leaveRoom(this.senderId, roomName);
-  // }
-
-  // private getRoomName(): string {
-  //   return `chat_${Math.min(this.senderId, this.usuario.id)}_${Math.max(this.senderId, this.usuario.id)}`;
-  // }
-
-  // private loadMessages() {
-  //   this.messageService.getMessages(this.usuario.id).subscribe({
-  //     next: (messages: Mensaje[]) => {
-  //       this.messages = messages;
-  //     },
-  //     error: (err) => console.error('Error loading messages:', err)
-  //   });
-  // }
-
-
-  receivedMessages(): void
-  {
-   
-    this.messageService.getMessages(this.senderId)
-    .subscribe(messages => {
-    }); 
-  }
-
-  sendMessage(){
-  let self = this
-   let new_message: SentMessage = {
-    sender_id: this.senderId,
-    recipient_id: this.usuario.id,
-    content: this.message.value ?? ""
-   }
-
-   this.messageService.sendMessage(new_message).subscribe({
-    next(value: Mensaje){
-      self.socketService.emit('send_message', new_message);
-      console.log("mensaje enviado con éxito")
-      self.messages.push({
-        sender_id: self.senderId,
-        recipient_id: self.usuario.id,
-        content: self.message.value ?? ""
+  loadMessages(): void {
+    if (this.selectedUser) {
+      this.messageservice.getMessages(this.usuario.id).subscribe({
+        next: (mensajes) => {
+          console.log("Mensajes cargados:", mensajes);
+          this.messages = mensajes.map(mensaje => ({
+            sender: mensaje.sender_id,
+            recipient: mensaje.recipient_id,
+            content: mensaje.content
+          }));
+        },
+        error: (err) => {
+          console.error("Error al cargar los mensajes:", err);
+        }
       });
-      self.message.reset();
-
-    }, error(err) {
-      console.log(err)
-      console.log("no se envio el mensaje")
-    },
-   })
+    }
   }
-  // private listenForNewMessages() {
-  //   this.newMessageSubscription = this.socketService.onNewMessage().subscribe({
-  //     next: (message: Mensaje) => {
-  //       if (
-  //         (message.sender_id === this.senderId && message.recipient_id === this.usuario.id) ||
-  //         (message.sender_id === this.usuario.id && message.recipient_id === this.senderId)
-  //       ) {
-  //         this.messages.push(message);
-  //       }
-  //     },
-  //     error: (err) => console.error('Error receiving new message:', err)
-  //   });
-  // }
+  sendMessage(){
+    let self = this
+    let current_user = this.cookie.getId()
+    this.sender_id = parseInt(current_user, 10);
+    let mensaje: SentMessage = {
+      sender_id: this.sender_id, //<}):o){| payaso
+      recipient_id: this.usuario.id,
+      content: this.message.value ?? ''
+    }
+    this.messageservice.sendMessage(mensaje).subscribe({
+      next: (value: Mensaje) => {
+        const roomName = `chat_${Math.min(this.sender_id, this.usuario.id)}_${Math.max(this.sender_id, this.usuario.id)}`;
+        
+        this.socket.emit('send_message', {
+          sender_id: this.sender_id,
+          recipient_id: this.usuario.id,
+          content: this.message.value,
+          room_name: roomName
+        });
+    
+        // this.messages.push({
+        //   sender: this.sender_id,
+        //   recipient: this.usuario.id,
+        //   content: this.message.value
+        // });
+    
+        this.message.reset();
+      },
+      error: (err) => {
+        console.log("error",err);
+      },
+    })
 
-  //      sendMessage() {
-  //     if (this.message.invalid) return;
-    
-  //     const newMessage: Mensaje = {
-  //       sender_id: this.senderId,
-  //       recipient_id: this.usuario.id,
-  //       content: new Text(this.message.value ?? ''), // Convert string to Text
-  //       timestamp: new Date(), // Assigning a Date object instead of a string
-  //       id: Date.now() // Temporary ID
-  //     };
-    
-  //     // Optimistically add the message to the UI
-  //     this.messages.push(newMessage);
-    
-  //     // Send message via WebSocket
-  //     this.socketService.sendMessage(newMessage);
-    
-  //     // Fallback: Send message via HTTP if WebSocket fails
-  //     this.messageService.sendMessage(newMessage).subscribe({
-  //       error: (err) => {
-  //         console.error('Error sending message via HTTP:', err);
-  //         // You might want to notify the user or retry
-  //       }
-  //     });
-    
-  //     this.message.reset();
-  //   }
+  }
+
+
 }
