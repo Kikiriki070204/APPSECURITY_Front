@@ -24,8 +24,7 @@ export class UserChatComponent {
   selectedUser: User | null = null;
   message = new FormControl('',Validators.required)
   messages: { sender: any, recipient: any, content: any }[] = [];
-  sender: any = null
-  recipient: any = null
+  recipient_id: any = null
   content: any = null
   message_sent: boolean = false
   mensaje: any = null
