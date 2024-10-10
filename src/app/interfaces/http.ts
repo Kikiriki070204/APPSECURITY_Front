@@ -6,5 +6,5 @@ export interface HttpResponse {
     ok: boolean;
     name: string;
     message: string;
-    error: {msg: string};
+    error: {message: string};
 }

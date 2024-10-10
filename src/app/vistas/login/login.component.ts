@@ -45,9 +45,18 @@ export class LoginComponent {
             self.router.navigate(['/chats'])
           },
           error(err: HttpResponse) {
+            console.log(err)
             if(err.status == 401)
             {
-              self.errorMessage = 'Contraseña incorrecta'
+              if(err.error.message == "Credenciales incorrectas")
+              {
+                self.errorMessage = 'Contraseña incorrecta'
+              }
+              else
+              {
+                self.errorMessage = "Debes verificar tu cuenta antes de iniciar sesión"
+              }
+              
             }
           }
         })
