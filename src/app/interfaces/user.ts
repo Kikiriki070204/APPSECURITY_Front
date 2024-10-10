@@ -5,7 +5,7 @@ export interface User {
     email: string
     password: string
     access_token: string
-    
+
 }
 export interface Register {
     username: string

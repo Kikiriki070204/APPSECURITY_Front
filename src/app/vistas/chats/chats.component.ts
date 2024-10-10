@@ -15,10 +15,10 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-chats',
   standalone: true,
-  imports: [NgFor, NgIf, 
+  imports: [NgFor, NgIf,
     UserChatComponent,
 
-    
+
   ],
   templateUrl: './chats.component.html',
   styleUrl: './chats.component.css'
@@ -30,7 +30,7 @@ user_id: any = null
 messages: any[] = []
 
 
-constructor(protected userService: UserService, 
+constructor(protected userService: UserService,
   protected socket: SocketService, protected cookie: AuthService,
 protected MensajesService: MensajesService,
 protected chatService: ChatService,
@@ -40,6 +40,8 @@ private HttpClient: HttpClient
 
 ngOnInit(): void {
 this.usuariosActivos()
+console.log("usuarios")
+console.log(localStorage.getItem('access_token'))
 let current_user = this.cookie.getId()
     this.user_id = parseInt(current_user, 10);
 }
@@ -51,13 +53,13 @@ usuariosActivos(): void
       this.usuarios = users.usuarios;
       console.log("usuarios")
       console.log(this.usuarios)
-    }); 
+    });
 }
- 
+
 selectedUserChat(usuario: User): void {
   this.selectedUser = usuario;
-  this.chatService.setSelectedUser(usuario); 
-  
+  this.chatService.setSelectedUser(usuario);
+
   console.log("start chatting with: ", this.selectedUser.name);
 
   const roomName = `chat_${Math.min(this.user_id, this.selectedUser.id)}_${Math.max(this.user_id, this.selectedUser.id)}`;
@@ -71,12 +73,18 @@ selectedUserChat(usuario: User): void {
 
   this.socket.checkRooms();
 }
+
 logout(): void {
-  this.cookiee.delete('id');
-  localStorage.removeItem('access_token');
-  this.socket.disconnect();
-  window.location.href = '/';
-  console.log("logout")
+  console.log(localStorage.getItem('access_token'));
+  this.userService.logout().subscribe(() => {
+    this.cookiee.delete('id');
+    localStorage.removeItem('access_token');
+    this.socket.disconnect();
+    window.location.href = '/';
+    console.log("logout");
+  }, error => {
+    console.error('Logout failed', error);
+  });
 }
 
 

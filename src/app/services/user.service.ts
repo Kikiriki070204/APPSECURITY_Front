@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Login, Register, User, UsuariosActivos } from '../interfaces/user';
 import { Observable } from 'rxjs';
@@ -21,5 +21,13 @@ export class UserService {
 
   usuariosActivos(): Observable<UsuariosActivos>{
     return this.http.get<UsuariosActivos>(`${enviroment.api_url}/menu`);
+  }
+   logout(): Observable<any> {
+    console.log(localStorage.getItem('access_token'));
+    console.log("logout");
+
+    const token = localStorage.getItem('access_token'); // Assuming you store the token in localStorage
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put(`${enviroment.api_url}/logout`, {}, { headers });
   }
 }
