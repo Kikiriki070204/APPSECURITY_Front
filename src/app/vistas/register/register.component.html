@@ -41,14 +41,20 @@
           <label class="label">
             <span class="label-text">Contraseña</span>
           </label>
-          <input
-            type="password"
-            id="password"
-            [formControl]="password"
-            placeholder="••••••••"
-            class="input input-bordered"
-            required
-          />
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              id="password"
+              [formControl]="password"
+              placeholder="••••••••"
+              class="input input-bordered w-full pr-12"
+              required
+            />
+            <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 px-2 flex items-center">
+              <i *ngIf="!showPassword" class="fas fa-eye text-gray-500"></i>
+              <i *ngIf="showPassword" class="fas fa-eye-slash text-gray-500"></i>
+            </button>
+          </div>
           <label class="label">
           </label>
         </div>

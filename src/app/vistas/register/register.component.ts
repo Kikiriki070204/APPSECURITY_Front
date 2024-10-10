@@ -17,8 +17,13 @@ export class RegisterComponent {
   username = new FormControl('',Validators.required)
   email = new FormControl('', Validators.required)
   password = new FormControl('', Validators.minLength(6))
+  showPassword = false
 
   constructor(protected service: UserService, protected router: Router){}
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   registrar(){
     let self = this
